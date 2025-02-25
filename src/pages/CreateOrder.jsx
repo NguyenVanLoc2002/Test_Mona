@@ -51,6 +51,7 @@ const CreateOrder = () => {
     name: "",
     email: "",
     phone: "",
+    customerCash: "",
   });
   const [cart, setCart] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("cash");
@@ -99,25 +100,6 @@ const CreateOrder = () => {
     setCart((prevCart) =>
       prevCart.map((item) => {
         if (item.id === id) {
-          if (field === "discountCode") {
-            const discount = discountCodes[value];
-            if (discount) {
-              // Kiểm tra loại giảm giá
-              const discountValue =
-                discount.type === "percent"
-                  ? (item.price * discount.value) / 100
-                  : discount.value;
-
-              return {
-                ...item,
-                discountCode: value,
-                discount: discountValue,
-              };
-            } else {
-              alert("Mã giảm giá không hợp lệ!");
-              return { ...item, discountCode: "", discount: 0 };
-            }
-          }
           return { ...item, [field]: value };
         }
         return item;
@@ -147,9 +129,22 @@ const CreateOrder = () => {
               return item;
             })
           );
+        } else {
+          setCart((prevCart) =>
+            prevCart.map((item) => {
+              if (item.id === Number(id)) {
+                return {
+                  ...item,
+                  discountCode: "",
+                  discount: 0,
+                };
+              }
+              return item;
+            })
+          );
         }
       });
-    }, 1000); // Delay 1 giây
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [discountInput, cart]);
@@ -166,6 +161,7 @@ const CreateOrder = () => {
       setCart((prevCart) => prevCart.filter((item) => item.id !== id));
     }, 500);
   };
+
   const totalAmount =
     cart && cart.length > 0
       ? cart.reduce(
@@ -221,10 +217,6 @@ const CreateOrder = () => {
     setShowConfirmModal(true);
   };
 
-  useEffect(() => {
-    console.log(orderData);
-  });
-
   const handleAccess = () => {
     alert("Thanh toán thành công!");
     setCustomer({ name: "", email: "", phone: "" });
@@ -236,6 +228,7 @@ const CreateOrder = () => {
     setDiscountInput({});
     setShowConfirmModal(false);
   };
+
 
   return (
     <div className="w-full mx-auto p-8 bg-gradient-to-br from-green-200 to-green-400 rounded-lg shadow-xl">
